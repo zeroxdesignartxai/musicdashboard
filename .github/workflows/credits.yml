@@ -1,30 +1,57 @@
-# Inserts list of community members into ./README.md
 name: 💓 Inserts Contributors & Sponsors
+
 on:
-  workflow_dispatch: # Manual dispatch
+  workflow_dispatch:
   schedule:
-    - cron: '45 1 * * 0' # At 01:45 on Sunday.
+    - cron: '45 1 * * 0' # At 01:45 UTC on Sunday
+
+permissions:
+  contents: write
+
+concurrency:
+  group: credits-workflow
+  cancel-in-progress: true
 
 jobs:
-  # Job #1 - Fetches sponsors and inserts table into readme
   insert-sponsors:
     runs-on: ubuntu-latest
     name: Inserts Sponsors 💓
+    timeout-minutes: 10
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Updates readme with sponsors
-        uses: JamesIves/github-sponsors-readme-action@v1
+
+      - name: Log start - sponsors
+        run: echo "Starting sponsors update..."
+
+      - name: Update README with sponsors
+        uses: JamesIves/github-sponsors-readme-action@v1.6.0
         with:
           token: ${{ secrets.BOT_TOKEN || secrets.GITHUB_TOKEN }}
           file: .github/README.md
 
-  # Job #2 - Fetches contributors and inserts table into readme
+      - name: Upload sponsors artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sponsors-readme
+          path: .github/README.md
+          retention-days: 7
+
   insert-contributors:
     runs-on: ubuntu-latest
     name: Inserts Contributors 💓
+    timeout-minutes: 10
+
     steps:
-      - name: Updates readme with contributors
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log start - contributors
+        run: echo "Starting contributors update..."
+
+      - name: Update README with contributors
         uses: akhilmhdh/contributors-readme-action@v2.3.10
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN || secrets.GITHUB_TOKEN }}
@@ -32,6 +59,14 @@ jobs:
           image_size: 80
           readme_path: .github/README.md
           columns_per_row: 6
-          commit_message: 'docs: Updates contributors list'
+          commit_message: "docs: update contributors list"
           committer_username: liss-bot
           committer_email: liss-bot@d0h.co
+
+      - name: Upload contributors artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contributors-readme
+          path: .github/README.md
+          retention-days: 7
