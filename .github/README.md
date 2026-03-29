@@ -912,6 +912,13 @@ Credit to the following users for contributing to Web-Check
                     <sub><b>zeroxdesignartxai</b></sub>
                 </a>
             </td>
+            <td align="center">
+                <a href="https://github.com/liss-bot">
+                    <img src="https://avatars.githubusercontent.com/u/87835202?v=4" width="80;" alt="liss-bot"/>
+                    <br />
+                    <sub><b>Alicia Bot</b></sub>
+                </a>
+            </td>
 		</tr>
 	<tbody>
 </table>
